@@ -201,7 +201,7 @@ int fitsBits(int x, int n) {
 
   int A = x>>31;
   int B = (1<<31)>>(33+~n);
-  int C =  ~A&B&x | A&B&~x;
+  int C =  (~A&B&x) | (A&B&~x);
   return !C;
 
 }
@@ -228,24 +228,20 @@ int addOK(int x, int y) {
  *   Rating: 3
  */
 int isGreater(int x, int y) {
-  int A = ~(x>>31);
+  
+  int A = x>>31;
   int B = y>>31;
-  int nx = ~(x+1)+1;
-  int ny = ~(y+1)+1;
-
-  /* sign(x) != sign(y) */
-  int C = A&B;
-
-  x = A&~B& x | ~A&B& ny;
-  y = A&~B& y | ~A&B& nx;
-
-  /* sign(x) == sign(y) */
-  int E = (A^B)&(x^y&x);
-
+  int nA = ~A;
+  int nB = ~B;
+  int C = nA&B;
+  int P = nA&nB;
+  int N = A&B;
+  int x2 = (P&x) | (N&~y);
+  int y2 = (P&y) | (N&~x);
+  int D = x2+~y2+1;
+  int E = ~(D>>31)&D;
   int Z = !!(C|E);
 
-
-  /* prii(!!Z); */
   return Z;
 }
 
@@ -272,13 +268,13 @@ int rotateLeft(int x, int n) {
  */
 int sm2tc(int x) {
 
-  int A = x>>31;
-  int B = ~A&x;
-  int N = ~x+1;
-  int abs= ~A&x | A&N;
-  int Z = ~A&abs | A&(~abs+1) ;
-  return Z;
-
+  /* int A = x>>31; */
+  /* int B = ~A&x; */
+  /* int N = ~x+1; */
+  /* int abs= (~A&x | A&N; */
+  /* int Z = ~A&abs | A&(~abs+1) ; */
+  /* return Z; */
+  return 2;
 }
 
 /* 
@@ -292,7 +288,7 @@ int sm2tc(int x) {
 int absVal(int x) {
   int A = x>>31;
   int N = ~x+1;
-  return  ~A&x | A&N;
+  return  (~A&x) | (A&N);
 
 }
 
