@@ -228,12 +228,25 @@ int addOK(int x, int y) {
  *   Rating: 3
  */
 int isGreater(int x, int y) {
-  int A = x+~y+1;
-  int B = A >> 31;
+  int A = ~(x>>31);
+  int B = y>>31;
+  int nx = ~(x+1)+1;
+  int ny = ~(y+1)+1;
 
-  return !B;
+  /* sign(x) != sign(y) */
+  int C = A&B;
 
-  /* return 2; */
+  x = A&~B& x | ~A&B& ny;
+  y = A&~B& y | ~A&B& nx;
+
+  /* sign(x) == sign(y) */
+  int E = (A^B)&(x^y&x);
+
+  int Z = !!(C|E);
+
+
+  /* prii(!!Z); */
+  return Z;
 }
 
 /* 
