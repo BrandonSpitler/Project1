@@ -1,3 +1,5 @@
+/* modified */
+
 /* 
  * CS 154 Project 1: Bit Manipulation
  * 
