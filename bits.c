@@ -1,5 +1,3 @@
-/* modified */
-
 /* 
  * CS 154 Project 1: Bit Manipulation
  * 
@@ -256,7 +254,7 @@ int isGreater(int x, int y) {
  *   Rating: 3 
  */
 int rotateLeft(int x, int n) {
-
+  
   return 2;
 }
 
@@ -269,14 +267,12 @@ int rotateLeft(int x, int n) {
  *   Rating: 4
  */
 int sm2tc(int x) {
-
-  /* int A = x>>31; */
-  /* int B = ~A&x; */
-  /* int N = ~x+1; */
-  /* int abs= (~A&x | A&N; */
-  /* int Z = ~A&abs | A&(~abs+1) ; */
-  /* return Z; */
-  return 2;
+  int A = x>>31;
+  int N = ~x+1;
+  int B = N|(1<<31);
+  int Z = (~A&x) | (A&B);
+  int G = (!!(x<<1)<<31)>>31;
+  return Z&G;
 }
 
 /* 
@@ -291,7 +287,6 @@ int absVal(int x) {
   int A = x>>31;
   int N = ~x+1;
   return  (~A&x) | (A&N);
-
 }
 
 /* 
