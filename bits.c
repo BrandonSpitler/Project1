@@ -306,8 +306,16 @@ int absVal(int x) {
  *   Rating: 2
  */
 unsigned float_neg(unsigned uf) {
-  
-  return 2;
+  int A = 1<<31;
+  int B = (A>>8);
+  int C = ~0^B;
+  int D = B^A;
+  int E = (D&uf)^D;
+  if (C&uf)
+    if( !E)
+      return uf;
+  return uf^A;
+
 }
 
 /* 
