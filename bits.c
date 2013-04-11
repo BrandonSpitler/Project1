@@ -254,8 +254,13 @@ int isGreater(int x, int y) {
  *   Rating: 3 
  */
 int rotateLeft(int x, int n) {
+  int A = x<<n;
+  int N = ~n;
+  int B = x>>(33+N);
+  int C = ~((1<<31)>>(32+N));
+  int D = C&B;
+  return A|D;
   
-  return 2;
 }
 
 /* 
@@ -301,7 +306,8 @@ int absVal(int x) {
  *   Rating: 2
  */
 unsigned float_neg(unsigned uf) {
- return 2;
+  
+  return 2;
 }
 
 /* 
