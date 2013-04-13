@@ -7,8 +7,8 @@
  * If you are working as a team, please identify yourselves
  * with your "CNetID: Name", by first uncommenting, and then 
  * editing the following two lines, filling your CNetIDs and Names */
-/* char PP0[] = "jhhadams: Jane H. H. Addams"; */
-/* char PP1[] = "nolittleplans: Daniel H. Burnham"; */
+char PP0[] = "jsmiller: Joshua S. Miller";
+char PP1[] = "dpbooth: Daniel P. Booth";
 /* Please leave "PP0" and "PP1" as is.
  * We will be grading the bits.c handed in by the FIRST ("PP0") person
  * in the pair above.
@@ -215,9 +215,14 @@ int fitsBits(int x, int n) {
  *   Rating: 3
  */
 int addOK(int x, int y) {
-  
-  
-  return 2;
+  int A = x+y;
+  int B = A>>31;
+  int C = x>>31;
+  int D = y>>31;
+  int P = ~C&~D;
+  int N = C&D;
+  int Z = (P&B)|(N&~B);
+  return !Z;
 }
 
 /* 
@@ -312,7 +317,7 @@ unsigned float_neg(unsigned uf) {
   int D = B^A;
   int E = (D&uf)^D;
   if (C&uf)
-    if( !E)
+    if(!E)
       return uf;
   return uf^A;
 
@@ -331,4 +336,5 @@ unsigned float_neg(unsigned uf) {
  */
 unsigned float_half(unsigned uf) {
   return 2;
+
 }
