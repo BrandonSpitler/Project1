@@ -164,7 +164,6 @@ int bitAnd(int x, int y) {
  */
 int negate(int x) {
   return ~x+1;
-
 }
 /* 
  * byteSwap - swaps the nth byte and the mth byte
@@ -176,16 +175,23 @@ int negate(int x) {
  *  Rating: 2
  */
 int byteSwap(int x, int n, int m) {
-
+  /* multiply m&n by 8 */
   int SM = m<<3;
   int SN = n<<3;
+  /* move set bits to mask bytes m and n */
   int M1 = 0xFF<<SN;  
   int M2 = 0xFF<<SM;
+  /* mask out byte n, move it the rightmost and then move it */
+    /* back to the m byte position */
   int A = (((x&M1)>>SN)<<SM)&M2;
+  /* mask out byte m, move it the rightmost and then move it */
+    /* back to the n byte position */
   int B = (((x&M2)>>SM)<<SN)&M1;
+  /* turn off bytes m and n in the original x */
   int C = x&~M1&~M2;
+  /* copy repositioned bytes into the original */
   return A|B|C;
-  /* Bam, that's 18 operators.  Beat that */
+
 }
 
 /* 
@@ -199,9 +205,16 @@ int byteSwap(int x, int n, int m) {
  */
 int fitsBits(int x, int n) {
 
+  /* Smear the the top bit to create 111... for negative */
+    /* and 000.... for positive */
   int A = x>>31;
+  /* Create a mask with bits above bit n turned on  */
   int B = (1<<31)>>(33+~n);
+  /* if positive, mask bits that go overflow into mask created in B*/
+  /* if negative, convert it to positive, subtract one, and do the same */
   int C =  (~A&B&x) | (A&B&~x);
+  /* if it fits, C will be zero, so return !0 = 1 */
+  /* if it doesn't fit, there will be overlap, C is nonzero, !C = 0 */
   return !C;
 
 }
@@ -215,13 +228,24 @@ int fitsBits(int x, int n) {
  *   Rating: 3
  */
 int addOK(int x, int y) {
+  /* naively add x and y */
   int A = x+y;
+  /* is that addition negative? smear topmost bit into B */
   int B = A>>31;
+  /* is x negative? smear topmost bit of x into C */
   int C = x>>31;
+  /* is y negative? smear topmost bit of y into C */
   int D = y>>31;
+  /* if x and y both positive, P = 111... otherwise P = 000... */
   int P = ~C&~D;
+  /* if x and y both negative N = 111..., otherwise N = 000... */
   int N = C&D;
+  /* if both positive and the addition negative, then NO! overflow, non-zero */
+  /* if both negative and the addition is positive then  NO! overflow, non-zero*/
+  /* combine the above results, if neither is true, ie the addition is the right sign  */
+  /* or the are opposite signs (no danger of overflow), then Z is zero */
   int Z = (P&B)|(N&~B);
+  /* return 1 for non-overflow, and 0 for overflow */
   return !Z;
 }
 
@@ -233,18 +257,28 @@ int addOK(int x, int y) {
  *   Rating: 3
  */
 int isGreater(int x, int y) {
-  
+  /* Smear negation bit to create a 111... for negative, 000.. for positive */
   int A = x>>31;
   int B = y>>31;
+  /* Take the opposite of these masks to use later */
   int nA = ~A;
   int nB = ~B;
+  /* C is true if, x>0 && y<0, and false if x<0, y>0 */
   int C = nA&B;
+  /* P tells us if they are both positive */
   int P = nA&nB;
+  /* N tells us if they are both negative */
   int N = A&B;
+  /* if x < 0, then x2 = -y -1 */
   int x2 = (P&x) | (N&~y);
+  /* if y < 0, then y2 = -x -1 */
   int y2 = (P&y) | (N&~x);
+  /* subtract y2 from x2 -> D */
   int D = x2+~y2+1;
+  /* if D is less than 0, E is non-zero and x > y */
   int E = ~(D>>31)&D;
+  /* combine opposite sign comparison with subtraction */
+    /* comparison/ convert to 0 or 1 */
   int Z = !!(C|E);
 
   return Z;
@@ -259,11 +293,18 @@ int isGreater(int x, int y) {
  *   Rating: 3 
  */
 int rotateLeft(int x, int n) {
+  /* shift top n bits left */
   int A = x<<n;
+  /* take negative n -1 to use for subtraction later */
   int N = ~n;
+  /* shift x right 32 - n bits so the top n bits are  */
+    /* int the first n bit slots */
   int B = x>>(33+N);
+  /* create a mask with only n right-most bits on */
   int C = ~((1<<31)>>(32+N));
+  /* use that mask to pull out the bits we moved there from the left */
   int D = C&B;
+  /* splice the new right-most bits into the left shifted x */
   return A|D;
   
 }
@@ -277,10 +318,17 @@ int rotateLeft(int x, int n) {
  *   Rating: 4
  */
 int sm2tc(int x) {
+  /* smear the negation bit to create negation truth value */
   int A = x>>31;
+  /* negate x */
   int N = ~x+1;
+  /* create B which is the same as x, but with the negation bit  */
+    /* garunteed to be on */
   int B = N|(1<<31);
+  /* if our truth value A is all ones, then x is negative, Z = B */
+  /* if our truth value A is all zeros, then Z = x */
   int Z = (~A&x) | (A&B);
+  /* mask G handles the case of -0 */
   int G = (!!(x<<1)<<31)>>31;
   return Z&G;
 }
@@ -294,8 +342,13 @@ int sm2tc(int x) {
  *   Rating: 4
  */
 int absVal(int x) {
+  /* smear negation bit, if negative, A = 1111.... */
+		      /* if positive, A = 000... */
   int A = x>>31;
+  /* negate x */
   int N = ~x+1;
+  /* if A is all zeros A&N = 00, then return 11...&x = x */
+  /* if A is all ones A&N = N, then return 000...&x = 0 */
   return  (~A&x) | (A&N);
 }
 
@@ -311,14 +364,23 @@ int absVal(int x) {
  *   Rating: 2
  */
 unsigned float_neg(unsigned uf) {
+  /* mask A is topmost bit */
   int A = 1<<31;
-  int B = (A>>8);
+  /* smear A to make B cover the bits through the exponent */
+  int B = A>>8;
+  /* take all bits except the exponent and negation bit -> mask C */
   int C = ~0^B;
+  /* turn negation bit in C on -> D*/
   int D = B^A;
+  /* check to see if all bits in the exponent are on */
   int E = (D&uf)^D;
+  /* are any of the fractional bits on? */
   if (C&uf)
+    /* if so, are the exponent bits all on? this measn NaN */
     if(!E)
+      /* return original */
       return uf;
+  /* otherise, simply flip the negation bit in the original and return */
   return uf^A;
 
 }
@@ -335,6 +397,36 @@ unsigned float_neg(unsigned uf) {
  *   Rating: 4
  */
 unsigned float_half(unsigned uf) {
+  int s_mask = 1 << 31;
+  int temp_mask = (s_mask >> 8);
+  int e_mask = s_mask^temp_mask;
+  int neg_1 = s_mask >> 31;
+  int f_mask = ~temp_mask;
+  int odd_mask = 3;
+  int case_mask = 1 << 22;
+  int s = s_mask & uf;
+  int e = e_mask & uf;
+  int f = f_mask & uf;
+  int E = e_mask ^ e;
+  int odd = odd_mask & f;
+  int O = !(odd^3);
+  int shift = (f + O) >> 1;
+
+  /* NaN Case */
+  if (!E)
+    return uf;
+  /* exp = 0 case */
+  if (!e){
+    return s | shift;
+  }
+  /* exp = 1 case */
+  /* shift from norm to denorm */
+  if (!((e >> 23)^1)){
+    return s | case_mask | shift;
+  }
+  /* decrease exp by 1*/
+  return s | ((e + neg_1)&e_mask) | f;
+  
   return 2;
 
 }
